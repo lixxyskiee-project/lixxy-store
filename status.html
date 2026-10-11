@@ -1,0 +1,547 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#09090f">
+  <meta name="description" content="Periksa status pesanan Lixxy Store.">
+  <title>Status Pesanan | Lixxy Store</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #09090f;
+      --panel: #14141f;
+      --border: #29293b;
+      --text: #f4f4fa;
+      --muted: #a3a3b8;
+      --accent: #a78bfa;
+      --green: #4ade80;
+      --yellow: #facc15;
+      --red: #fb7185;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px 16px;
+      background:
+        radial-gradient(ellipse at top, #242044 0%, transparent 48%),
+        var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      padding: 22px 0 30px;
+    }
+
+    .logo {
+      display: inline-block;
+      font-size: 27px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: white;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    header p,
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .card {
+      background: rgba(20, 20, 31, 0.96);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 16px;
+      box-shadow: 0 16px 45px #00000020;
+    }
+
+    h1 {
+      font-size: 23px;
+      margin: 0 0 8px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin: 0 0 18px;
+    }
+
+    label {
+      display: block;
+      margin: 20px 0 8px;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #0c0c15;
+      color: white;
+      font: inherit;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 16px;
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .primary {
+      width: 100%;
+      margin-top: 12px;
+      color: #100c20;
+      background: var(--accent);
+    }
+
+    .secondary {
+      color: white;
+      background: #29293b;
+    }
+
+    .status-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 99px;
+      background: #343044;
+      color: #e9ddff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .badge.pending,
+    .badge.awaiting_payment {
+      background: #493b16;
+      color: var(--yellow);
+    }
+
+    .badge.paid,
+    .badge.processing {
+      background: #193a32;
+      color: #6ee7b7;
+    }
+
+    .badge.success {
+      background: #153d29;
+      color: var(--green);
+    }
+
+    .badge.failed,
+    .badge.cancelled {
+      background: #461f2b;
+      color: var(--red);
+    }
+
+    .details {
+      margin: 0;
+    }
+
+    .details div {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .details div:last-child {
+      border-bottom: 0;
+    }
+
+    .details dt {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .details dd {
+      margin: 0;
+      text-align: right;
+      overflow-wrap: anywhere;
+      font-size: 14px;
+      font-weight: 650;
+      max-width: 65%;
+    }
+
+    .order-id {
+      color: var(--accent);
+      overflow-wrap: anywhere;
+      font-size: 13px;
+    }
+
+    .notice {
+      padding: 13px;
+      margin-top: 16px;
+      border-radius: 12px;
+      background: #292335;
+      color: #e4d8ff;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .message {
+      margin-top: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .error {
+      color: var(--red);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .actions button {
+      flex: 1;
+      min-width: 130px;
+    }
+
+    footer {
+      padding: 18px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <header>
+      <a class="logo" href="./index.html">
+        LIXXY<span>STORE</span>
+      </a>
+      <p>Pesananmu, statusnya bisa kamu periksa di sini.</p>
+    </header>
+
+    <section class="card">
+      <h1>Status Pesanan</h1>
+      <p class="muted">
+        Masukkan ID pesanan yang kamu dapatkan setelah checkout.
+      </p>
+
+      <form id="statusForm">
+        <label for="orderId">ID Pesanan</label>
+        <input
+          id="orderId"
+          name="orderId"
+          type="text"
+          placeholder="Masukkan ID pesanan"
+          maxlength="36"
+          autocomplete="off"
+          required
+        >
+
+        <button class="primary" id="searchButton" type="submit">
+          Periksa Pesanan
+        </button>
+      </form>
+
+      <p id="message" class="message" role="status" aria-live="polite" hidden></p>
+    </section>
+
+    <section class="card" id="result" aria-live="polite" hidden>
+      <div class="status-top">
+        <h2>Detail Pesanan</h2>
+        <span class="badge" id="statusBadge">Memuat</span>
+      </div>
+
+      <p class="muted">ID Pesanan</p>
+      <div class="order-id" id="resultId"></div>
+
+      <dl class="details">
+        <div>
+          <dt>Produk</dt>
+          <dd id="resultProduct">-</dd>
+        </div>
+        <div>
+          <dt>Nominal</dt>
+          <dd id="resultDenomination">-</dd>
+        </div>
+        <div>
+          <dt>Harga contoh</dt>
+          <dd id="resultPrice">-</dd>
+        </div>
+        <div>
+          <dt>Dibuat pada</dt>
+          <dd id="resultCreated">-</dd>
+        </div>
+        <div>
+          <dt>Terakhir diperbarui</dt>
+          <dd id="resultUpdated">-</dd>
+        </div>
+      </dl>
+
+      <div class="notice" id="statusExplanation">
+        Status ini bukan konfirmasi pembayaran.
+      </div>
+
+      <div class="actions">
+        <button class="secondary" id="refreshButton" type="button">
+          Periksa Lagi
+        </button>
+        <button class="secondary" id="copyButton" type="button">
+          Salin ID
+        </button>
+      </div>
+    </section>
+
+    <footer>
+      <p>© <span id="year"></span> Lixxy Store</p>
+      <p><a href="./index.html">Kembali ke halaman utama</a></p>
+      <p>Mode demo. Pembayaran dan pengiriman produk belum aktif.</p>
+    </footer>
+  </main>
+
+  <script>
+    "use strict";
+
+    const API_BASE =
+      "https://lixxystore.lixxyskiee.workers.dev";
+
+    const form = document.getElementById("statusForm");
+    const input = document.getElementById("orderId");
+    const message = document.getElementById("message");
+    const result = document.getElementById("result");
+    const searchButton = document.getElementById("searchButton");
+    const refreshButton = document.getElementById("refreshButton");
+    const copyButton = document.getElementById("copyButton");
+    const statusBadge = document.getElementById("statusBadge");
+
+    let currentOrderId = "";
+    let isLoading = false;
+
+    document.getElementById("year").textContent =
+      new Date().getFullYear();
+
+    function formatRupiah(amount) {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+
+    function formatDate(value) {
+      if (!value) return "-";
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) return "-";
+
+      return new Intl.DateTimeFormat("id-ID", {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZone: "Asia/Jakarta"
+      }).format(date) + " WIB";
+    }
+
+    function showMessage(text, isError = false) {
+      message.textContent = text;
+      message.className =
+        "message" + (isError ? " error" : "");
+      message.hidden = false;
+    }
+
+    function explainStatus(status) {
+      const explanations = {
+        pending:
+          "Pesanan tercatat di server, tetapi belum dibayar. Ini bukan bukti pembayaran.",
+        awaiting_payment:
+          "Pesanan menunggu pembayaran. Pembayaran belum terverifikasi di mode demo.",
+        paid:
+          "Status tercatat sebagai paid. Pastikan pembayaran diverifikasi oleh sistem pembayaran sebelum memproses produk.",
+        processing:
+          "Pesanan tercatat sedang diproses. Mode demo tidak menjamin produk telah dikirim.",
+        success:
+          "Status tercatat sebagai success. Konfirmasikan pengiriman melalui penyedia produk jika integrasi tersedia.",
+        failed:
+          "Pesanan tercatat gagal. Hubungi pengelola toko untuk pemeriksaan lebih lanjut.",
+        cancelled:
+          "Pesanan tercatat dibatalkan."
+      };
+
+      return explanations[status] ||
+        "Status berasal dari server. Hubungi pengelola toko jika memerlukan bantuan.";
+    }
+
+    function renderOrder(order) {
+      document.getElementById("resultId").textContent =
+        order.id || "-";
+
+      document.getElementById("resultProduct").textContent =
+        order.product || "-";
+
+      document.getElementById("resultDenomination").textContent =
+        order.denomination || "-";
+
+      document.getElementById("resultPrice").textContent =
+        formatRupiah(Number(order.examplePrice || 0));
+
+      document.getElementById("resultCreated").textContent =
+        formatDate(order.createdAt);
+
+      document.getElementById("resultUpdated").textContent =
+        formatDate(order.updatedAt);
+
+      statusBadge.textContent = order.status || "unknown";
+      statusBadge.className =
+        "badge " + (order.status || "");
+
+      document.getElementById("statusExplanation").textContent =
+        explainStatus(order.status);
+
+      result.hidden = false;
+    }
+
+    async function lookupOrder(id) {
+      if (isLoading) return;
+
+      const orderId = id.trim();
+
+      if (!/^[a-f0-9-]{32,36}$/i.test(orderId)) {
+        result.hidden = true;
+        showMessage(
+          "Format ID tidak valid. Masukkan ID pesanan yang lengkap.",
+          true
+        );
+        return;
+      }
+
+      isLoading = true;
+      currentOrderId = orderId;
+      input.value = orderId;
+      searchButton.disabled = true;
+      refreshButton.disabled = true;
+      searchButton.textContent = "Memeriksa...";
+      showMessage("Sedang mengambil status pesanan dari server...");
+
+      try {
+        const response = await fetch(
+          API_BASE + "/api/orders/" + encodeURIComponent(orderId),
+          { method: "GET", cache: "no-store" }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.ok || !data.order) {
+          throw new Error(
+            data.error || "Pesanan tidak ditemukan."
+          );
+        }
+
+        renderOrder(data.order);
+        showMessage("Status pesanan berhasil diperbarui.");
+
+        const url = new URL(window.location.href);
+        url.searchParams.set("id", orderId);
+        window.history.replaceState({}, "", url);
+      } catch (error) {
+        result.hidden = true;
+        showMessage(
+          error.message ||
+          "Gagal menghubungi server. Periksa koneksi internet lalu coba lagi.",
+          true
+        );
+      } finally {
+        isLoading = false;
+        searchButton.disabled = false;
+        refreshButton.disabled = false;
+        searchButton.textContent = "Periksa Pesanan";
+      }
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      lookupOrder(input.value);
+    });
+
+    refreshButton.addEventListener("click", () => {
+      if (currentOrderId) lookupOrder(currentOrderId);
+    });
+
+    copyButton.addEventListener("click", async () => {
+      if (!currentOrderId) return;
+
+      try {
+        await navigator.clipboard.writeText(currentOrderId);
+        copyButton.textContent = "ID Tersalin";
+
+        setTimeout(() => {
+          copyButton.textContent = "Salin ID";
+        }, 1800);
+      } catch {
+        showMessage(
+          "Salin ID dari kolom ID Pesanan secara manual."
+        );
+      }
+    });
+
+    // Jika URL berisi ?id=..., langsung periksa pesanan.
+    const initialId =
+      new URLSearchParams(window.location.search).get("id");
+
+    if (initialId) {
+      input.value = initialId;
+      lookupOrder(initialId);
+    }
+  </script>
+</body>
+</html>
