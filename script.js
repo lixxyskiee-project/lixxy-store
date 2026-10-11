@@ -1,280 +1,422 @@
+/* ==========================================
+LIXXY STORE | SCRIPT UTAMA
+Cocok dengan index.html dan style.css
+Mode demo, belum ada transaksi sungguhan
+========================================== */
+
 "use strict";
 
-// ========================================
-// LIXXYSTORE - FRONTEND DEMO
-// Semua pesanan masih demo, belum transaksi asli.
-// ========================================
-
+// 1. KATALOG PRODUK
 const products = {
-  "Mobile Legends": {
-    fields: [
-      {
-        name: "userid",
-        label: "User ID Mobile Legends",
-        placeholder: "Masukkan User ID",
-        type: "text"
-      },
-      {
-        name: "zoneid",
-        label: "Zone ID",
-        placeholder: "Masukkan Zone ID",
-        type: "text"
-      }
-    ],
-    denominations: [
-      { label: "86 Diamonds", value: "86 Diamonds" },
-      { label: "172 Diamonds", value: "172 Diamonds" },
-      { label: "257 Diamonds", value: "257 Diamonds" },
-      { label: "344 Diamonds", value: "344 Diamonds" },
-      { label: "706 Diamonds", value: "706 Diamonds" },
-      { label: "Weekly Diamond Pass", value: "Weekly Diamond Pass" }
-    ]
-  },
+"Mobile Legends": {
+fields: [
+{
+name: "userId",
+label: "User ID",
+placeholder: "Masukkan User ID",
+required: true,
+inputMode: "numeric"
+},
+{
+name: "zoneId",
+label: "Zone ID",
+placeholder: "Masukkan Zone ID",
+required: true,
+inputMode: "numeric"
+}
+],
+denominations: [
+["86 Diamonds", 20000],
+["172 Diamonds", 39000],
+["257 Diamonds", 58000],
+["344 Diamonds", 77000],
+["706 Diamonds", 155000]
+]
+},
 
-  "Free Fire": {
-    fields: [
-      {
-        name: "playerid",
-        label: "Player ID Free Fire",
-        placeholder: "Masukkan Player ID",
-        type: "text"
-      }
-    ],
-    denominations: [
-      { label: "5 Diamonds", value: "5 Diamonds" },
-      { label: "12 Diamonds", value: "12 Diamonds" },
-      { label: "50 Diamonds", value: "50 Diamonds" },
-      { label: "70 Diamonds", value: "70 Diamonds" },
-      { label: "140 Diamonds", value: "140 Diamonds" },
-      { label: "355 Diamonds", value: "355 Diamonds" },
-      { label: "720 Diamonds", value: "720 Diamonds" }
-    ]
-  },
+"Free Fire": {
+fields: [
+{
+name: "playerId",
+label: "Player ID",
+placeholder: "Masukkan Player ID",
+required: true,
+inputMode: "numeric"
+}
+],
+denominations: [
+["70 Diamonds", 10000],
+["140 Diamonds", 20000],
+["355 Diamonds", 50000],
+["720 Diamonds", 99000],
+["1450 Diamonds", 198000]
+]
+},
 
-  "DANA": {
-    fields: [
-      {
-        name: "phone",
-        label: "Nomor HP akun DANA",
-        placeholder: "Contoh: 08xxxxxxxxxx",
-        type: "tel"
-      }
-    ],
-    denominations: [
-      { label: "Saldo Rp10.000", value: "Saldo Rp10.000" },
-      { label: "Saldo Rp20.000", value: "Saldo Rp20.000" },
-      { label: "Saldo Rp50.000", value: "Saldo Rp50.000" },
-      { label: "Saldo Rp100.000", value: "Saldo Rp100.000" }
-    ]
-  },
+"DANA": {
+fields: [
+{
+name: "phoneNumber",
+label: "Nomor HP akun DANA",
+placeholder: "Masukkan nomor HP DANA",
+required: true,
+inputMode: "tel"
+}
+],
+denominations: [
+["Saldo Rp10.000", 10000],
+["Saldo Rp20.000", 20000],
+["Saldo Rp50.000", 50000],
+["Saldo Rp100.000", 100000]
+]
+},
 
-  "ShopeePay": {
-    fields: [
-      {
-        name: "phone",
-        label: "Nomor HP akun ShopeePay",
-        placeholder: "Contoh: 08xxxxxxxxxx",
-        type: "tel"
-      }
-    ],
-    denominations: [
-      { label: "Saldo Rp10.000", value: "Saldo Rp10.000" },
-      { label: "Saldo Rp20.000", value: "Saldo Rp20.000" },
-      { label: "Saldo Rp50.000", value: "Saldo Rp50.000" },
-      { label: "Saldo Rp100.000", value: "Saldo Rp100.000" }
-    ]
-  },
+"ShopeePay": {
+fields: [
+{
+name: "phoneNumber",
+label: "Nomor HP akun ShopeePay",
+placeholder: "Masukkan nomor HP ShopeePay",
+required: true,
+inputMode: "tel"
+}
+],
+denominations: [
+["Saldo Rp10.000", 10000],
+["Saldo Rp20.000", 20000],
+["Saldo Rp50.000", 50000],
+["Saldo Rp100.000", 100000]
+]
+},
 
-  "Token PLN": {
-    fields: [
-      {
-        name: "plnid",
-        label: "ID Pelanggan atau Nomor Meter",
-        placeholder: "Masukkan nomor pelanggan",
-        type: "text"
-      }
-    ],
-    denominations: [
-      { label: "Token Rp20.000", value: "Token Rp20.000" },
-      { label: "Token Rp50.000", value: "Token Rp50.000" },
-      { label: "Token Rp100.000", value: "Token Rp100.000" },
-      { label: "Token Rp200.000", value: "Token Rp200.000" },
-      { label: "Token Rp500.000", value: "Token Rp500.000" },
-      { label: "Token Rp1.000.000", value: "Token Rp1.000.000" }
-    ]
-  }
+"Token PLN": {
+fields: [
+{
+name: "customerId",
+label: "Nomor Meter / ID Pelanggan",
+placeholder: "Masukkan nomor meter atau ID pelanggan",
+required: true,
+inputMode: "numeric"
+},
+{
+name: "customerName",
+label: "Nama pelanggan (opsional)",
+placeholder: "Masukkan nama pelanggan",
+required: false,
+inputMode: "text"
+}
+],
+denominations: [
+["Token Rp20.000", 20000],
+["Token Rp50.000", 50000],
+["Token Rp100.000", 100000],
+["Token Rp200.000", 200000]
+]
+}
 };
 
-// Elemen halaman
+// 2. AMBIL ELEMEN HTML
 const searchInput = document.getElementById("searchInput");
-const productCards = document.querySelectorAll(".product-card");
+const productCards = [...document.querySelectorAll(".product-card")];
+const filterButtons = [...document.querySelectorAll(".filter-button")];
 const emptyMessage = document.getElementById("emptyMessage");
+
+const orderForm = document.getElementById("orderForm");
 const selectedProduct = document.getElementById("selectedProduct");
 const dynamicFields = document.getElementById("dynamicFields");
 const denomination = document.getElementById("denomination");
-const orderForm = document.getElementById("orderForm");
 const orderResult = document.getElementById("orderResult");
+const customerNote = document.getElementById("customerNote");
+const orderSection = document.getElementById("pesanan");
 
-// Tahun footer
-document.getElementById("year").textContent =
-  new Date().getFullYear();
+let activeCategory = "all";
 
-// Pencarian produk
-searchInput.addEventListener("input", function () {
-  const keyword = this.value.trim().toLowerCase();
-  let visibleCount = 0;
+// 3. UTILITAS
+function rupiah(amount) {
+return new Intl.NumberFormat("id-ID", {
+style: "currency",
+currency: "IDR",
+maximumFractionDigits: 0
+}).format(amount);
+}
 
-  productCards.forEach(function (card) {
-    const searchableText =
-      (card.dataset.search || "") + " " + card.textContent;
+function showMessage(message) {
+if (!orderResult) return;
 
-    const matches = searchableText
-      .toLowerCase()
-      .includes(keyword);
+orderResult.textContent = message;
+orderResult.hidden = false;
+}
 
-    card.hidden = !matches;
+function hideMessage() {
+if (!orderResult) return;
 
-    if (matches) {
-      visibleCount++;
-    }
-  });
+orderResult.textContent = "";
+orderResult.hidden = true;
+}
 
-  emptyMessage.hidden = visibleCount !== 0;
+// 4. PENCARIAN DAN FILTER KATEGORI
+function filterProducts() {
+const query = (searchInput?.value || "").trim().toLowerCase();
+let visibleCount = 0;
+
+productCards.forEach((card) => {
+const productName = card.querySelector("h3")?.textContent || "";
+const searchableText = [
+productName,
+card.dataset.search || "",
+card.textContent || ""
+].join(" ").toLowerCase();
+
+const matchesSearch = searchableText.includes(query);
+const matchesCategory =
+  activeCategory === "all" ||
+  card.dataset.category === activeCategory;
+
+const visible = matchesSearch && matchesCategory;
+card.hidden = !visible;
+
+if (visible) visibleCount++;
+
 });
 
-// Buat input berdasarkan produk yang dipilih
+if (emptyMessage) {
+emptyMessage.hidden = visibleCount !== 0;
+}
+}
+
+searchInput?.addEventListener("input", filterProducts);
+
+filterButtons.forEach((button) => {
+button.setAttribute(
+"aria-pressed",
+String(button.classList.contains("active"))
+);
+
+button.addEventListener("click", () => {
+activeCategory = button.dataset.filter || "all";
+
+filterButtons.forEach((item) => {
+  const isActive = item === button;
+
+  item.classList.toggle("active", isActive);
+  item.setAttribute("aria-pressed", String(isActive));
+});
+
+filterProducts();
+
+});
+});
+
+// 5. RESET FORMULIR
+function resetOrderForm() {
+if (selectedProduct) {
+selectedProduct.value = "";
+}
+
+if (dynamicFields) {
+dynamicFields.replaceChildren();
+}
+
+if (denomination) {
+denomination.replaceChildren();
+
+const placeholder = document.createElement("option");
+placeholder.value = "";
+placeholder.textContent = "Pilih nominal";
+
+denomination.appendChild(placeholder);
+denomination.disabled = true;
+denomination.value = "";
+
+}
+
+if (customerNote) {
+customerNote.value = "";
+}
+
+hideMessage();
+}
+
+// 6. MEMBANGUN FORM BERDASARKAN PRODUK
 function renderProductFields(productName) {
-  const product = products[productName];
+const product = products[productName];
 
-  if (!product) return;
-
-  selectedProduct.value = productName;
-  dynamicFields.replaceChildren();
-
-  product.fields.forEach(function (field) {
-    const label = document.createElement("label");
-    label.htmlFor = "field-" + field.name;
-    label.textContent = field.label;
-
-    const input = document.createElement("input");
-    input.id = "field-" + field.name;
-    input.name = field.name;
-    input.type = field.type;
-    input.placeholder = field.placeholder;
-    input.autocomplete = "off";
-    input.required = true;
-    input.maxLength = 60;
-
-    dynamicFields.append(label, input);
-  });
-
-  // Isi pilihan nominal
-  denomination.replaceChildren();
-
-  const firstOption = document.createElement("option");
-  firstOption.value = "";
-  firstOption.textContent = "Pilih nominal";
-  denomination.appendChild(firstOption);
-
-  product.denominations.forEach(function (item) {
-    const option = document.createElement("option");
-    option.value = item.value;
-    option.textContent = item.label;
-    denomination.appendChild(option);
-  });
-
-  orderResult.hidden = true;
+if (!product || !selectedProduct || !dynamicFields || !denomination) {
+showMessage("Formulir belum siap. Silakan muat ulang halaman.");
+return false;
 }
 
-// Tombol pilih produk
-document.querySelectorAll(".order-button").forEach(function (button) {
-  button.addEventListener("click", function () {
-    const productName = this.dataset.product;
+selectedProduct.value = productName;
+dynamicFields.replaceChildren();
+denomination.replaceChildren();
 
-    renderProductFields(productName);
+// Kolom identitas sesuai produk
+product.fields.forEach((field) => {
+const wrapper = document.createElement("div");
+wrapper.className = "form-group";
 
-    document.getElementById("pesanan").scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-  });
+const label = document.createElement("label");
+const input = document.createElement("input");
+
+input.id = `customer-${field.name}`;
+input.name = field.name;
+input.type = "text";
+input.inputMode = field.inputMode || "text";
+input.placeholder = field.placeholder;
+input.required = field.required;
+input.autocomplete = "off";
+input.maxLength = field.inputMode === "tel" ? 20 : 40;
+
+label.htmlFor = input.id;
+label.textContent = field.label;
+
+wrapper.append(label, input);
+dynamicFields.appendChild(wrapper);
+
 });
 
-// Buat nomor pesanan demo
-function createDemoOrderId() {
-  const timePart = Date.now().toString().slice(-8);
-  const randomPart = Math.floor(1000 + Math.random() * 9000);
+// Pengguna harus memilih nominal secara sadar
+const placeholder = document.createElement("option");
+placeholder.value = "";
+placeholder.textContent = "Pilih nominal";
+placeholder.selected = true;
 
-  return "LXS-" + timePart + "-" + randomPart;
+denomination.appendChild(placeholder);
+
+product.denominations.forEach(([name, price]) => {
+const option = document.createElement("option");
+
+option.value = name;
+option.textContent = `${name} | Harga contoh ${rupiah(price)}`;
+option.dataset.price = String(price);
+
+denomination.appendChild(option);
+
+});
+
+denomination.disabled = false;
+denomination.value = "";
+
+hideMessage();
+return true;
 }
 
-// Proses formulir demo
-orderForm.addEventListener("submit", function (event) {
-  event.preventDefault();
+// 7. TOMBOL PILIH PRODUK
+document.querySelectorAll(".order-button").forEach((button) => {
+button.addEventListener("click", () => {
+const productName = button.dataset.product;
 
-  if (!orderForm.reportValidity()) return;
+if (!products[productName]) {
+  alert("Produk tidak ditemukan. Periksa nama produk pada HTML.");
+  return;
+}
 
-  const productName = selectedProduct.value;
-  const selectedNominal = denomination.value;
+const success = renderProductFields(productName);
 
-  if (!products[productName] || !selectedNominal) {
-    alert("Silakan pilih produk dan nominal terlebih dahulu.");
-    return;
-  }
+if (!success) return;
 
-  const formData = new FormData(orderForm);
-  const orderId = createDemoOrderId();
-
-  const order = {
-    orderId: orderId,
-    product: productName,
-    denomination: selectedNominal,
-    createdAt: new Date().toLocaleString("id-ID"),
-    status: "DEMO - BELUM DIBAYAR"
-  };
-
-  products[productName].fields.forEach(function (field) {
-    order[field.name] = String(
-      formData.get(field.name) || ""
-    ).trim();
-  });
-
-  const note = String(formData.get("note") || "").trim();
-
-  // Tampilkan hasil di halaman tanpa mengirim data ke server.
-  orderResult.replaceChildren();
-
-  const title = document.createElement("strong");
-  title.textContent = "Pesanan demo berhasil dibuat!";
-
-  const details = document.createElement("p");
-  details.style.marginTop = "10px";
-  details.style.lineHeight = "1.9";
-
-  details.textContent =
-    "Nomor pesanan: " + order.orderId +
-    "\nProduk: " + order.product +
-    "\nNominal: " + order.denomination +
-    "\nWaktu: " + order.createdAt +
-    "\nStatus: " + order.status +
-    (note ? "\nCatatan: " + note : "");
-
-  const warning = document.createElement("p");
-  warning.style.marginTop = "12px";
-  warning.textContent =
-    "Ini hanya simulasi di perangkat kamu. " +
-    "Pesanan tidak tersimpan di server, " +
-    "tidak ada pembayaran, dan produk tidak dikirim.";
-
-  orderResult.append(title, details, warning);
-  orderResult.hidden = false;
-
-  orderResult.scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
-
-  console.log("LixxyStore demo order:", order);
+orderSection?.scrollIntoView({
+  behavior: "smooth",
+  block: "start"
 });
 
-console.log("LixxyStore siap dalam mode demo.");
+// Fokus ke kolom pertama tanpa memaksa halaman melompat lagi.
+const firstInput = dynamicFields?.querySelector("input");
+
+if (firstInput) {
+  window.setTimeout(() => {
+    firstInput.focus({ preventScroll: true });
+  }, 350);
+}
+
+});
+});
+
+// 8. KIRIM FORMULIR DEMO
+orderForm?.addEventListener("submit", (event) => {
+event.preventDefault();
+
+const productName = selectedProduct?.value || "";
+const product = products[productName];
+
+if (!product) {
+alert("Pilih produk dari katalog terlebih dahulu.");
+return;
+}
+
+if (!orderForm.reportValidity()) return;
+
+const selectedOption = denomination?.selectedOptions?.[0];
+
+if (!selectedOption || !selectedOption.value) {
+alert("Pilih nominal produk terlebih dahulu.");
+denomination?.focus();
+return;
+}
+
+// Periksa kolom wajib sekali lagi.
+for (const field of product.fields) {
+const input = orderForm.elements.namedItem(field.name);
+
+if (field.required && (!input || !input.value.trim())) {
+  alert(`Kolom "${field.label}" wajib diisi.`);
+  input?.focus();
+  return;
+}
+
+}
+
+const examplePrice = Number(selectedOption.dataset.price || 0);
+
+if (!Number.isFinite(examplePrice) || examplePrice <= 0) {
+alert("Harga contoh tidak valid. Silakan pilih nominal kembali.");
+return;
+}
+
+const details = {
+product: productName,
+denomination: selectedOption.value,
+examplePrice: rupiah(examplePrice)
+};
+
+product.fields.forEach((field) => {
+const input = orderForm.elements.namedItem(field.name);
+
+if (input && input.value.trim()) {
+  details[field.label] = input.value.trim();
+}
+
+});
+
+if (customerNote?.value.trim()) {
+details.note = customerNote.value.trim();
+}
+
+showMessage(
+  `DEMO BERHASIL! Produk: ${details.product}. ` +
+  `Nominal: ${details.denomination}. ` +
+  `Harga contoh: ${details.examplePrice}. ` +
+  "Ini hanya simulasi. Pesanan tidak dikirim ke server, " +
+  "tidak dibayar, dan tidak diproses."
+);
+
+orderResult?.scrollIntoView({
+behavior: "smooth",
+block: "nearest"
+});
+
+// Data hanya ditampilkan di konsol lokal untuk pengujian.
+// Tidak ada permintaan jaringan atau penyimpanan server.
+console.info("Lixxy Store demo berhasil dijalankan.");
+});
+
+// 9. TAHUN FOOTER
+const yearElement = document.getElementById("year");
+
+if (yearElement) {
+yearElement.textContent = new Date().getFullYear();
+}
+
+// 10. KONDISI AWAL HALAMAN
+resetOrderForm();
+filterProducts();
