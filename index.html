@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d1b">
+  <meta name="description" content="LixxyStore - Top up game dan layanan digital.">
+  <title>LixxyStore | Digital Store</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="navbar">
+    <a href="#" class="logo">Lixxy<span>Store</span></a>
+    <a href="#produk" class="nav-button">Mulai Belanja</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-badge">
+        <span class="status-dot"></span>
+        LIXXY STORE
+      </div>
+
+      <h1>Top Up Mudah,<br><span>Hidup Makin Seru.</span></h1>
+
+      <p>
+        Top up game dan layanan digital favoritmu dalam satu tempat.
+        Praktis, simpel, dan nyaman lewat HP.
+      </p>
+
+      <a href="#produk" class="primary-button">Jelajahi Produk ↗</a>
+
+      <div class="hero-stats">
+        <div><strong>5</strong><small>Kategori</small></div>
+        <div><strong>24/7</strong><small>Akses website</small></div>
+        <div><strong>Easy</strong><small>Order online</small></div>
+      </div>
+    </section>
+
+    <section class="products-section" id="produk">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">KOLEKSI PRODUK</span>
+          <h2>Pilih kebutuhanmu</h2>
+        </div>
+        <span class="product-count">05 PRODUK</span>
+      </div>
+
+      <div class="search-box">
+        <span>⌕</span>
+        <input id="searchInput" type="search"
+          placeholder="Cari Mobile Legends, DANA, PLN...">
+      </div>
+
+      <div class="product-grid" id="productGrid">
+        <article class="product-card" data-search="mobile legends ml diamond game">
+          <div class="product-art ml-art"><span>ML</span></div>
+          <div class="product-info">
+            <span class="category">GAME</span>
+            <h3>Mobile Legends</h3>
+            <p>Diamond untuk akun ML kamu.</p>
+            <button class="order-button" data-product="Mobile Legends"
+              data-fields="userid,zoneid">Pilih Produk <span>↗</span></button>
+          </div>
+        </article>
+
+        <article class="product-card" data-search="free fire ff diamond game">
+          <div class="product-art ff-art"><span>FF</span></div>
+          <div class="product-info">
+            <span class="category">GAME</span>
+            <h3>Free Fire</h3>
+            <p>Diamond untuk akun Free Fire.</p>
+            <button class="order-button" data-product="Free Fire"
+              data-fields="playerid">Pilih Produk <span>↗</span></button>
+          </div>
+        </article>
+
+        <article class="product-card" data-search="dana dompet digital">
+          <div class="product-art dana-art"><span>DANA</span></div>
+          <div class="product-info">
+            <span class="category">E-WALLET</span>
+            <h3>DANA</h3>
+            <p>Layanan saldo dompet digital.</p>
+            <button class="order-button" data-product="DANA"
+              data-fields="phone">Pilih Produk <span>↗</span></button>
+          </div>
+        </article>
+
+        <article class="product-card" data-search="shopeepay shopee saldo dompet digital">
+          <div class="product-art shop-art"><span>SPay</span></div>
+          <div class="product-info">
+            <span class="category">E-WALLET</span>
+            <h3>ShopeePay</h3>
+            <p>Layanan saldo ShopeePay.</p>
+            <button class="order-button" data-product="ShopeePay"
+              data-fields="phone">Pilih Produk <span>↗</span></button>
+          </div>
+        </article>
+
+        <article class="product-card" data-search="pln listrik token prabayar">
+          <div class="product-art pln-art"><span>PLN</span></div>
+          <div class="product-info">
+            <span class="category">TAGIHAN & LISTRIK</span>
+            <h3>Token PLN</h3>
+            <p>Token listrik prabayar.</p>
+            <button class="order-button" data-product="Token PLN"
+              data-fields="plnid">Pilih Produk <span>↗</span></button>
+          </div>
+        </article>
+      </div>
+
+      <p class="empty-message" id="emptyMessage" hidden>
+        Produk tidak ditemukan. Coba kata kunci lain.
+      </p>
+    </section>
+
+    <section class="order-section" id="pesanan">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">LANGKAH BERIKUTNYA</span>
+          <h2>Formulir pesanan</h2>
+        </div>
+      </div>
+
+      <div class="order-panel">
+        <p class="form-note">
+          Pilih produk di atas untuk mengisi formulir pesanan.
+        </p>
+
+        <form id="orderForm">
+          <label for="selectedProduct">Produk</label>
+          <input id="selectedProduct" name="product" readonly
+            placeholder="Pilih produk terlebih dahulu" required>
+
+          <div id="dynamicFields"></div>
+
+          <label for="denomination">Nominal</label>
+          <select id="denomination" name="denomination" required>
+            <option value="">Pilih nominal</option>
+          </select>
+
+          <label for="customerNote">Catatan (opsional)</label>
+          <textarea id="customerNote" name="note"
+            placeholder="Catatan tambahan..." rows="3"></textarea>
+
+          <button class="primary-button submit-button" type="submit">
+            Buat Pesanan Demo ↗
+          </button>
+        </form>
+
+        <div id="orderResult" class="order-result" hidden></div>
+        <p class="disclaimer">
+          Mode demo: pesanan belum dikirim ke penyedia layanan dan
+          pembayaran belum diproses.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a href="#" class="logo">Lixxy<span>Store</span></a>
+    <p>Digital services, made simple.</p>
+    <small>© <span id="year"></span> LixxyStore</small>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
