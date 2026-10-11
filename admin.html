@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -31,22 +30,16 @@
       font-family: system-ui, sans-serif;
     }
 
-    main {
-      max-width: 1050px;
-      margin: auto;
-    }
-
-    header {
-      margin: 10px 0 24px;
-    }
-
+    main { max-width: 1100px; margin: auto; }
+    header { margin: 10px 0 24px; }
     h1 { font-size: 27px; margin-bottom: 6px; }
     h2 { font-size: 19px; }
+    h3 { font-size: 16px; }
     p { line-height: 1.6; }
-    .muted { color: var(--muted); font-size: 14px; }
+    .muted { color: var(--muted); font-size: 13px; }
 
     .card {
-      padding: 19px;
+      padding: 18px;
       margin-bottom: 17px;
       border: 1px solid var(--border);
       border-radius: 16px;
@@ -72,10 +65,10 @@
     }
 
     button {
-      min-height: 42px;
-      padding: 10px 15px;
+      min-height: 40px;
+      padding: 9px 13px;
       border: 0;
-      border-radius: 10px;
+      border-radius: 9px;
       background: var(--accent);
       color: #120d20;
       font: inherit;
@@ -83,11 +76,20 @@
       cursor: pointer;
     }
 
-    button:disabled { opacity: .55; }
+    button:disabled { opacity: .55; cursor: wait; }
 
     .secondary {
       color: var(--text);
       background: #303044;
+    }
+
+    .link-button {
+      padding: 0;
+      min-height: auto;
+      color: var(--accent);
+      background: transparent;
+      text-align: left;
+      overflow-wrap: anywhere;
     }
 
     .form-grid {
@@ -129,10 +131,7 @@
       margin-top: 7px;
     }
 
-    .table-wrap {
-      overflow-x: auto;
-      width: 100%;
-    }
+    .table-wrap { overflow-x: auto; width: 100%; }
 
     table {
       border-collapse: collapse;
@@ -164,15 +163,39 @@
       font-weight: 800;
     }
 
-    .pending, .awaiting_payment {
-      color: var(--yellow);
-    }
-
-    .paid, .processing, .success {
-      color: var(--green);
-    }
-
+    .pending, .awaiting_payment { color: var(--yellow); }
+    .paid, .processing, .success { color: var(--green); }
     .failed, .cancelled { color: var(--red); }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .detail-item {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      min-width: 0;
+    }
+
+    .detail-item strong {
+      display: block;
+      margin-top: 7px;
+      overflow-wrap: anywhere;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .notice {
+      padding: 12px;
+      border-radius: 10px;
+      background: #242033;
+      color: #ddd6fe;
+      font-size: 13px;
+      line-height: 1.6;
+    }
 
     footer {
       padding: 15px 0;
@@ -182,12 +205,12 @@
     }
 
     a { color: var(--accent); }
-
     [hidden] { display: none !important; }
 
     @media (min-width: 620px) {
       .form-grid { grid-template-columns: 2fr 1fr; }
       .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
@@ -196,16 +219,15 @@
 <main>
   <header>
     <h1>Lixxy Store | Admin</h1>
-    <p class="muted">
-      Dashboard pemantauan pesanan. Mode demo.
-    </p>
+    <p class="muted">Dashboard pemantauan pesanan. Mode demo.</p>
     <a href="./index.html">Kembali ke toko</a>
   </header>
 
   <section class="card" id="loginCard">
     <h2>Akses Admin</h2>
     <p class="muted">
-      Masukkan token admin yang disimpan sebagai secret di Cloudflare Worker.
+      Masukkan token yang disimpan sebagai secret ADMIN_TOKEN
+      di Cloudflare Worker.
     </p>
 
     <form id="loginForm">
@@ -215,12 +237,11 @@
         type="password"
         autocomplete="off"
         spellcheck="false"
-        required
         minlength="64"
         maxlength="64"
         placeholder="Tempel token admin"
+        required
       >
-
       <div class="actions">
         <button id="loginButton" type="submit">
           Masuk dan Muat Pesanan
@@ -229,13 +250,12 @@
     </form>
 
     <p class="muted">
-      Jangan bagikan token. Hindari menggunakan dashboard ini
-      di perangkat umum atau perangkat yang tidak dipercaya.
+      Jangan bagikan token dan jangan memasukkannya ke GitHub.
     </p>
   </section>
 
   <section id="dashboard" hidden>
-    <div class="card">
+    <section class="card">
       <div class="stats">
         <div class="stat">
           <span class="muted">Pesanan ditampilkan</span>
@@ -246,11 +266,11 @@
           <strong id="pendingCount">0</strong>
         </div>
         <div class="stat">
-          <span class="muted">Success (status tercatat)</span>
+          <span class="muted">Status success tercatat</span>
           <strong id="successCount">0</strong>
         </div>
       </div>
-    </div>
+    </section>
 
     <section class="card">
       <h2>Daftar Pesanan</h2>
@@ -282,10 +302,8 @@
         </div>
 
         <div class="actions">
-          <button type="submit" id="loadButton">
-            Muat Pesanan
-          </button>
-          <button type="button" class="secondary" id="logoutButton">
+          <button id="loadButton" type="submit">Muat Pesanan</button>
+          <button id="logoutButton" class="secondary" type="button">
             Keluar
           </button>
         </div>
@@ -293,8 +311,8 @@
 
       <p id="message" class="message" role="status" aria-live="polite"></p>
       <p class="muted">
-        Data diurutkan dari pesanan terbaru. Informasi identitas
-        pelanggan tidak ditampilkan pada tabel ini.
+        Ketuk ID pesanan untuk melihat detail. Data terbaru dimuat
+        dari server saat kamu memilih pesanan atau menekan tombol periksa.
       </p>
 
       <div class="table-wrap">
@@ -311,61 +329,125 @@
             </tr>
           </thead>
           <tbody id="ordersBody">
-            <tr>
-              <td colspan="7">Belum ada data dimuat.</td>
-            </tr>
+            <tr><td colspan="7">Belum ada data dimuat.</td></tr>
           </tbody>
         </table>
+      </div>
+    </section>
+
+    <section id="detailCard" class="card" hidden>
+      <h2>Detail Pesanan</h2>
+      <p class="muted">
+        Informasi referensi pelanggan hanya ditampilkan di bagian detail ini.
+      </p>
+
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="muted">ID Pesanan</span>
+          <strong id="dId">-</strong>
+        </div>
+        <div class="detail-item">
+          <span class="muted">Status saat diperiksa</span>
+          <strong id="dStatus">-</strong>
+        </div>
+        <div class="detail-item">
+          <span class="muted">Kode Produk</span>
+          <strong id="dProductCode">-</strong>
+        </div>
+        <div class="detail-item">
+          <span class="muted">Nama Produk</span>
+          <strong id="dProductName">-</strong>
+        </div>
+        <div class="detail-item">
+          <span class="muted">Nominal</span>
+          <strong id="dDenomination">-</strong>
+        </div>
+        <div class="detail-item">
+          <span class="muted">Harga contoh</span>
+          <strong id="dAmount">-</strong>
+        </div>
+        <div class="detail-item">
+          <span class="muted">Referensi pelanggan</span>
+          <strong id="dCustomer">-</strong>
+        </div>
+        <div class="detail-item">
+          <span class="muted">Referensi pembayaran</span>
+          <strong id="dPayment">-</strong>
+        </div>
+        <div class="detail-item">
+          <span class="muted">Referensi supplier</span>
+          <strong id="dSupplier">-</strong>
+        </div>
+        <div class="detail-item">
+          <span class="muted">Waktu dibuat</span>
+          <strong id="dCreated">-</strong>
+        </div>
+        <div class="detail-item">
+          <span class="muted">Waktu diperbarui</span>
+          <strong id="dUpdated">-</strong>
+        </div>
+      </div>
+
+      <p class="notice">
+        Pemeriksaan ulang hanya membaca data server. Status paid atau success
+        di database bukan bukti pembayaran kecuali telah diverifikasi melalui
+        proses pembayaran resmi.
+      </p>
+
+      <p id="detailMessage" class="message" role="status" aria-live="polite"></p>
+
+      <div class="actions">
+        <button id="refreshDetailButton" type="button">
+          Periksa Status Terbaru
+        </button>
+        <button id="closeDetailButton" type="button" class="secondary">
+          Tutup Detail
+        </button>
       </div>
     </section>
   </section>
 
   <footer>
-    Dashboard admin Lixxy Store. Status demo bukan bukti pembayaran.
+    Lixxy Store Admin · Mode demo · Jaga kerahasiaan token dan data pelanggan.
   </footer>
 </main>
 
 <script>
 "use strict";
 
-const API_BASE =
-  "https://lixxystore.lixxyskiee.workers.dev";
+const API_BASE = "https://lixxystore.lixxyskiee.workers.dev";
 
-const loginCard = document.getElementById("loginCard");
-const dashboard = document.getElementById("dashboard");
-const loginForm = document.getElementById("loginForm");
-const tokenInput = document.getElementById("adminToken");
-const loginButton = document.getElementById("loginButton");
-const filterForm = document.getElementById("filterForm");
-const statusFilter = document.getElementById("statusFilter");
-const limitFilter = document.getElementById("limitFilter");
-const loadButton = document.getElementById("loadButton");
-const logoutButton = document.getElementById("logoutButton");
-const ordersBody = document.getElementById("ordersBody");
-const message = document.getElementById("message");
+const $ = (id) => document.getElementById(id);
 
 let adminToken = "";
 let busy = false;
+let detailBusy = false;
+let selectedOrderId = "";
 
 function setMessage(text, isError = false) {
-  message.textContent = text;
-  message.className = "message" + (isError ? " error" : " success");
+  $("message").textContent = text;
+  $("message").className = "message " + (isError ? "error" : "success");
 }
 
-function formatRupiah(amount) {
+function setDetailMessage(text, isError = false) {
+  $("detailMessage").textContent = text;
+  $("detailMessage").className =
+    "message " + (isError ? "error" : "success");
+}
+
+function formatRupiah(value) {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
     maximumFractionDigits: 0
-  }).format(Number(amount) || 0);
+  }).format(Number(value) || 0);
 }
 
 function formatDate(value) {
   if (!value) return "-";
 
   const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) return "-";
+  if (Number.isNaN(date.getTime())) return String(value);
 
   return new Intl.DateTimeFormat("id-ID", {
     dateStyle: "medium",
@@ -374,142 +456,211 @@ function formatDate(value) {
   }).format(date) + " WIB";
 }
 
-function addCell(row, text, className = "") {
+function addCell(row, value) {
   const cell = document.createElement("td");
-  cell.textContent = text == null ? "-" : String(text);
-
-  if (className) cell.className = className;
-
+  cell.textContent = value == null ? "-" : String(value);
   row.appendChild(cell);
   return cell;
 }
 
-function clearToken() {
-  adminToken = "";
-  tokenInput.value = "";
-  dashboard.hidden = true;
-  loginCard.hidden = false;
-  ordersBody.replaceChildren();
-  setMessage("Token admin sudah dihapus dari memori halaman.");
+function setDetailValue(id, value) {
+  // textContent mencegah nilai dari database ditafsirkan sebagai HTML.
+  $(id).textContent =
+    value === null || value === undefined || value === ""
+      ? "-"
+      : String(value);
 }
 
-function renderOrders(orders) {
-  ordersBody.replaceChildren();
+function clearDetail() {
+  selectedOrderId = "";
+  $("detailCard").hidden = true;
+  setDetailMessage("");
+}
 
-  if (!orders.length) {
-    const row = document.createElement("tr");
-    const cell = document.createElement("td");
+function clearToken() {
+  adminToken = "";
+  $("adminToken").value = "";
+  $("dashboard").hidden = true;
+  $("loginCard").hidden = false;
+  $("ordersBody").replaceChildren();
+  clearDetail();
+  setMessage("Token admin dihapus dari memori halaman.");
+}
 
-    cell.colSpan = 7;
-    cell.textContent = "Belum ada pesanan untuk filter ini.";
+async function apiGet(path) {
+  const response = await fetch(API_BASE + path, {
+    method: "GET",
+    headers: {
+      "Authorization": "Bearer " + adminToken
+    },
+    cache: "no-store"
+  });
 
-    row.appendChild(cell);
-    ordersBody.appendChild(row);
+  const data = await response.json().catch(() => ({
+    ok: false,
+    error: "Server tidak mengirim respons JSON yang valid."
+  }));
+
+  if (response.status === 401) {
+    clearToken();
+    throw new Error("Token ditolak. Masuk kembali dengan token yang benar.");
   }
 
-  let pending = 0;
-  let success = 0;
-
-  for (const order of orders) {
-    if (order.status === "pending") pending++;
-    if (order.status === "success") success++;
-
-    const row = document.createElement("tr");
-
-    addCell(row, order.id, "order-id");
-    addCell(row, order.product_name);
-    addCell(row, order.denomination);
-    addCell(row, formatRupiah(order.amount));
-
-    const statusCell = addCell(row, order.status);
-    const badge = document.createElement("span");
-    badge.className = "badge " + (order.status || "");
-    badge.textContent = order.status || "unknown";
-    statusCell.replaceChildren(badge);
-
-    addCell(row, formatDate(order.created_at));
-    addCell(row, formatDate(order.updated_at));
-
-    ordersBody.appendChild(row);
+  if (!response.ok || !data.ok) {
+    throw new Error(data.error || "Permintaan ke server gagal.");
   }
 
-  document.getElementById("totalCount").textContent =
-    String(orders.length);
-  document.getElementById("pendingCount").textContent =
-    String(pending);
-  document.getElementById("successCount").textContent =
-    String(success);
+  return data;
 }
 
 async function loadOrders() {
   if (busy || !adminToken) return;
 
   busy = true;
-  loadButton.disabled = true;
-  loginButton.disabled = true;
-  loadButton.textContent = "Memuat...";
+  $("loadButton").disabled = true;
+  $("loginButton").disabled = true;
+  $("loadButton").textContent = "Memuat...";
 
-  const status = statusFilter.value;
-  const limit = limitFilter.value;
+  const params = new URLSearchParams({
+    status: $("statusFilter").value,
+    limit: $("limitFilter").value
+  });
 
-  const url = new URL(API_BASE + "/api/admin/orders");
-  url.searchParams.set("status", status);
-  url.searchParams.set("limit", limit);
-
-  setMessage("Mengambil data pesanan dari server...");
+  setMessage("Mengambil daftar pesanan...");
 
   try {
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer " + adminToken
-      },
-      cache: "no-store"
-    });
-
-    const data = await response.json();
-
-    if (response.status === 401) {
-      clearToken();
-      setMessage(
-        "Token ditolak. Periksa token admin di Cloudflare.",
-        true
-      );
-      return;
-    }
-
-    if (!response.ok || !data.ok) {
-      throw new Error(data.error || "Gagal memuat pesanan.");
-    }
-
+    const data = await apiGet("/api/admin/orders?" + params.toString());
     renderOrders(data.orders || []);
-    dashboard.hidden = false;
-    loginCard.hidden = true;
+    $("dashboard").hidden = false;
+    $("loginCard").hidden = true;
 
-    setMessage(
-      `Berhasil memuat ${data.count} pesanan. Data berasal dari server.`
-    );
+    setMessage("Berhasil memuat " + data.count + " pesanan.");
   } catch (error) {
-    setMessage(
-      error.message ||
-      "Gagal menghubungi server. Periksa koneksi dan konfigurasi Worker.",
-      true
-    );
+    setMessage(error.message || "Gagal memuat pesanan.", true);
   } finally {
     busy = false;
-    loadButton.disabled = false;
-    loginButton.disabled = false;
-    loadButton.textContent = "Muat Pesanan";
+    $("loadButton").disabled = false;
+    $("loginButton").disabled = false;
+    $("loadButton").textContent = "Muat Pesanan";
   }
 }
 
-loginForm.addEventListener("submit", async (event) => {
+function renderOrders(orders) {
+  const body = $("ordersBody");
+  body.replaceChildren();
+
+  let pending = 0;
+  let success = 0;
+
+  if (!orders.length) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 7;
+    cell.textContent = "Belum ada pesanan untuk filter ini.";
+    row.appendChild(cell);
+    body.appendChild(row);
+  }
+
+  for (const order of orders) {
+    if (order.status === "pending") pending++;
+    if (order.status === "success") success++;
+
+    const row = document.createElement("tr");
+    const idCell = document.createElement("td");
+    idCell.className = "order-id";
+
+    const idButton = document.createElement("button");
+    idButton.type = "button";
+    idButton.className = "link-button";
+    idButton.textContent = order.id || "(tanpa ID)";
+    idButton.setAttribute(
+      "aria-label",
+      "Lihat detail pesanan " + (order.id || "")
+    );
+    idButton.addEventListener("click", () => {
+      if (order.id) loadOrderDetail(order.id);
+    });
+
+    idCell.appendChild(idButton);
+    row.appendChild(idCell);
+
+    addCell(row, order.product_name);
+    addCell(row, order.denomination);
+    addCell(row, formatRupiah(order.amount));
+
+    const statusCell = addCell(row, "");
+    const badge = document.createElement("span");
+    badge.className = "badge " + (order.status || "");
+    badge.textContent = order.status || "unknown";
+    statusCell.appendChild(badge);
+
+    addCell(row, formatDate(order.created_at));
+    addCell(row, formatDate(order.updated_at));
+
+    body.appendChild(row);
+  }
+
+  $("totalCount").textContent = String(orders.length);
+  $("pendingCount").textContent = String(pending);
+  $("successCount").textContent = String(success);
+}
+
+async function loadOrderDetail(orderId) {
+  if (!adminToken || detailBusy) return;
+
+  // Hanya menerima bentuk ID yang didukung endpoint Worker.
+  if (!/^[a-f0-9-]{32,36}$/i.test(orderId)) {
+    setMessage("Format ID pesanan tidak valid.", true);
+    return;
+  }
+
+  detailBusy = true;
+  selectedOrderId = orderId;
+  $("detailCard").hidden = false;
+  $("refreshDetailButton").disabled = true;
+  setDetailMessage("Mengambil detail terbaru dari server...");
+
+  try {
+    const data = await apiGet(
+      "/api/admin/orders/" + encodeURIComponent(orderId)
+    );
+
+    const order = data.order;
+
+    setDetailValue("dId", order.id);
+    setDetailValue("dStatus", order.status);
+    setDetailValue("dProductCode", order.productCode);
+    setDetailValue("dProductName", order.productName);
+    setDetailValue("dDenomination", order.denomination);
+    setDetailValue("dAmount", formatRupiah(order.amount));
+    setDetailValue("dCustomer", order.customerReference);
+    setDetailValue("dPayment", order.paymentReference);
+    setDetailValue("dSupplier", order.supplierReference);
+    setDetailValue("dCreated", formatDate(order.createdAt));
+    setDetailValue("dUpdated", formatDate(order.updatedAt));
+
+    setDetailMessage(
+      "Detail berhasil diperiksa langsung dari Worker dan D1."
+    );
+    $("detailCard").scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  } catch (error) {
+    setDetailMessage(error.message || "Gagal mengambil detail.", true);
+  } finally {
+    detailBusy = false;
+    $("refreshDetailButton").disabled = false;
+  }
+}
+
+$("loginForm").addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const candidate = tokenInput.value.trim();
+  const candidate = $("adminToken").value.trim();
 
   if (!/^[a-f0-9]{64}$/i.test(candidate)) {
-    setMessage("Format token tidak valid.", true);
+    setMessage("Format token tidak valid. Token harus 64 karakter hex.", true);
     return;
   }
 
@@ -517,16 +668,23 @@ loginForm.addEventListener("submit", async (event) => {
   await loadOrders();
 });
 
-filterForm.addEventListener("submit", async (event) => {
+$("filterForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   await loadOrders();
 });
 
-logoutButton.addEventListener("click", () => {
-  clearToken();
+$("logoutButton").addEventListener("click", clearToken);
+
+$("closeDetailButton").addEventListener("click", clearDetail);
+
+$("refreshDetailButton").addEventListener("click", async () => {
+  if (selectedOrderId) {
+    await loadOrderDetail(selectedOrderId);
+  }
 });
 
-// Tidak menyimpan token ke localStorage, sessionStorage, atau URL.
+// Token hanya berada di memori halaman.
+// Tidak disimpan di URL, localStorage, atau sessionStorage.
 </script>
 </body>
 </html>
