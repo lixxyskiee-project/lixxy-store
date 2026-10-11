@@ -584,17 +584,21 @@ orderForm?.addEventListener("submit", async (event) => {
       );
     }
 
-    renderOrder(data.order);
+    
+console.info(
+  "Lixxy Store: pesanan demo tersimpan.",
+  data.order.id
+);
 
-    orderResult?.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest"
-    });
+// Arahkan pelanggan ke halaman status
+const statusUrl = new URL(
+  "./status.html",
+  window.location.href
+);
 
-    console.info(
-      "Lixxy Store: pesanan demo tersimpan.",
-      data.order.id
-    );
+statusUrl.searchParams.set("id", data.order.id);
+window.location.assign(statusUrl.toString());
+
   } catch (error) {
     console.error("Lixxy Store API error:", error);
 
