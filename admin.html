@@ -1,0 +1,532 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#09090f">
+  <title>Admin | Lixxy Store</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #09090f;
+      --panel: #151522;
+      --border: #303044;
+      --text: #f4f4fa;
+      --muted: #aaaabe;
+      --accent: #a78bfa;
+      --green: #4ade80;
+      --yellow: #facc15;
+      --red: #fb7185;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px 14px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, sans-serif;
+    }
+
+    main {
+      max-width: 1050px;
+      margin: auto;
+    }
+
+    header {
+      margin: 10px 0 24px;
+    }
+
+    h1 { font-size: 27px; margin-bottom: 6px; }
+    h2 { font-size: 19px; }
+    p { line-height: 1.6; }
+    .muted { color: var(--muted); font-size: 14px; }
+
+    .card {
+      padding: 19px;
+      margin-bottom: 17px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--panel);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input, select {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #0c0c15;
+      color: var(--text);
+      font: inherit;
+    }
+
+    button {
+      min-height: 42px;
+      padding: 10px 15px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #120d20;
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    button:disabled { opacity: .55; }
+
+    .secondary {
+      color: var(--text);
+      background: #303044;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 13px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 14px;
+    }
+
+    .message {
+      overflow-wrap: anywhere;
+      font-size: 14px;
+    }
+
+    .error { color: var(--red); }
+    .success { color: var(--green); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 25px;
+      margin-top: 7px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 760px;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { color: var(--muted); }
+
+    .order-id {
+      max-width: 175px;
+      overflow-wrap: anywhere;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 99px;
+      background: #303044;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .pending, .awaiting_payment {
+      color: var(--yellow);
+    }
+
+    .paid, .processing, .success {
+      color: var(--green);
+    }
+
+    .failed, .cancelled { color: var(--red); }
+
+    footer {
+      padding: 15px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    a { color: var(--accent); }
+
+    [hidden] { display: none !important; }
+
+    @media (min-width: 620px) {
+      .form-grid { grid-template-columns: 2fr 1fr; }
+      .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+
+<body>
+<main>
+  <header>
+    <h1>Lixxy Store | Admin</h1>
+    <p class="muted">
+      Dashboard pemantauan pesanan. Mode demo.
+    </p>
+    <a href="./index.html">Kembali ke toko</a>
+  </header>
+
+  <section class="card" id="loginCard">
+    <h2>Akses Admin</h2>
+    <p class="muted">
+      Masukkan token admin yang disimpan sebagai secret di Cloudflare Worker.
+    </p>
+
+    <form id="loginForm">
+      <label for="adminToken">Token Admin</label>
+      <input
+        id="adminToken"
+        type="password"
+        autocomplete="off"
+        spellcheck="false"
+        required
+        minlength="64"
+        maxlength="64"
+        placeholder="Tempel token admin"
+      >
+
+      <div class="actions">
+        <button id="loginButton" type="submit">
+          Masuk dan Muat Pesanan
+        </button>
+      </div>
+    </form>
+
+    <p class="muted">
+      Jangan bagikan token. Hindari menggunakan dashboard ini
+      di perangkat umum atau perangkat yang tidak dipercaya.
+    </p>
+  </section>
+
+  <section id="dashboard" hidden>
+    <div class="card">
+      <div class="stats">
+        <div class="stat">
+          <span class="muted">Pesanan ditampilkan</span>
+          <strong id="totalCount">0</strong>
+        </div>
+        <div class="stat">
+          <span class="muted">Pending</span>
+          <strong id="pendingCount">0</strong>
+        </div>
+        <div class="stat">
+          <span class="muted">Success (status tercatat)</span>
+          <strong id="successCount">0</strong>
+        </div>
+      </div>
+    </div>
+
+    <section class="card">
+      <h2>Daftar Pesanan</h2>
+
+      <form id="filterForm">
+        <div class="form-grid">
+          <div>
+            <label for="statusFilter">Filter Status</label>
+            <select id="statusFilter">
+              <option value="all">Semua status</option>
+              <option value="pending">Pending</option>
+              <option value="awaiting_payment">Awaiting payment</option>
+              <option value="paid">Paid</option>
+              <option value="processing">Processing</option>
+              <option value="success">Success</option>
+              <option value="failed">Failed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="limitFilter">Jumlah maksimum</label>
+            <select id="limitFilter">
+              <option value="20">20 pesanan</option>
+              <option value="50" selected>50 pesanan</option>
+              <option value="100">100 pesanan</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" id="loadButton">
+            Muat Pesanan
+          </button>
+          <button type="button" class="secondary" id="logoutButton">
+            Keluar
+          </button>
+        </div>
+      </form>
+
+      <p id="message" class="message" role="status" aria-live="polite"></p>
+      <p class="muted">
+        Data diurutkan dari pesanan terbaru. Informasi identitas
+        pelanggan tidak ditampilkan pada tabel ini.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID Pesanan</th>
+              <th>Produk</th>
+              <th>Nominal</th>
+              <th>Harga contoh</th>
+              <th>Status</th>
+              <th>Dibuat</th>
+              <th>Diperbarui</th>
+            </tr>
+          </thead>
+          <tbody id="ordersBody">
+            <tr>
+              <td colspan="7">Belum ada data dimuat.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <footer>
+    Dashboard admin Lixxy Store. Status demo bukan bukti pembayaran.
+  </footer>
+</main>
+
+<script>
+"use strict";
+
+const API_BASE =
+  "https://lixxystore.lixxyskiee.workers.dev";
+
+const loginCard = document.getElementById("loginCard");
+const dashboard = document.getElementById("dashboard");
+const loginForm = document.getElementById("loginForm");
+const tokenInput = document.getElementById("adminToken");
+const loginButton = document.getElementById("loginButton");
+const filterForm = document.getElementById("filterForm");
+const statusFilter = document.getElementById("statusFilter");
+const limitFilter = document.getElementById("limitFilter");
+const loadButton = document.getElementById("loadButton");
+const logoutButton = document.getElementById("logoutButton");
+const ordersBody = document.getElementById("ordersBody");
+const message = document.getElementById("message");
+
+let adminToken = "";
+let busy = false;
+
+function setMessage(text, isError = false) {
+  message.textContent = text;
+  message.className = "message" + (isError ? " error" : " success");
+}
+
+function formatRupiah(amount) {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0
+  }).format(Number(amount) || 0);
+}
+
+function formatDate(value) {
+  if (!value) return "-";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "-";
+
+  return new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Jakarta"
+  }).format(date) + " WIB";
+}
+
+function addCell(row, text, className = "") {
+  const cell = document.createElement("td");
+  cell.textContent = text == null ? "-" : String(text);
+
+  if (className) cell.className = className;
+
+  row.appendChild(cell);
+  return cell;
+}
+
+function clearToken() {
+  adminToken = "";
+  tokenInput.value = "";
+  dashboard.hidden = true;
+  loginCard.hidden = false;
+  ordersBody.replaceChildren();
+  setMessage("Token admin sudah dihapus dari memori halaman.");
+}
+
+function renderOrders(orders) {
+  ordersBody.replaceChildren();
+
+  if (!orders.length) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+
+    cell.colSpan = 7;
+    cell.textContent = "Belum ada pesanan untuk filter ini.";
+
+    row.appendChild(cell);
+    ordersBody.appendChild(row);
+  }
+
+  let pending = 0;
+  let success = 0;
+
+  for (const order of orders) {
+    if (order.status === "pending") pending++;
+    if (order.status === "success") success++;
+
+    const row = document.createElement("tr");
+
+    addCell(row, order.id, "order-id");
+    addCell(row, order.product_name);
+    addCell(row, order.denomination);
+    addCell(row, formatRupiah(order.amount));
+
+    const statusCell = addCell(row, order.status);
+    const badge = document.createElement("span");
+    badge.className = "badge " + (order.status || "");
+    badge.textContent = order.status || "unknown";
+    statusCell.replaceChildren(badge);
+
+    addCell(row, formatDate(order.created_at));
+    addCell(row, formatDate(order.updated_at));
+
+    ordersBody.appendChild(row);
+  }
+
+  document.getElementById("totalCount").textContent =
+    String(orders.length);
+  document.getElementById("pendingCount").textContent =
+    String(pending);
+  document.getElementById("successCount").textContent =
+    String(success);
+}
+
+async function loadOrders() {
+  if (busy || !adminToken) return;
+
+  busy = true;
+  loadButton.disabled = true;
+  loginButton.disabled = true;
+  loadButton.textContent = "Memuat...";
+
+  const status = statusFilter.value;
+  const limit = limitFilter.value;
+
+  const url = new URL(API_BASE + "/api/admin/orders");
+  url.searchParams.set("status", status);
+  url.searchParams.set("limit", limit);
+
+  setMessage("Mengambil data pesanan dari server...");
+
+  try {
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Authorization": "Bearer " + adminToken
+      },
+      cache: "no-store"
+    });
+
+    const data = await response.json();
+
+    if (response.status === 401) {
+      clearToken();
+      setMessage(
+        "Token ditolak. Periksa token admin di Cloudflare.",
+        true
+      );
+      return;
+    }
+
+    if (!response.ok || !data.ok) {
+      throw new Error(data.error || "Gagal memuat pesanan.");
+    }
+
+    renderOrders(data.orders || []);
+    dashboard.hidden = false;
+    loginCard.hidden = true;
+
+    setMessage(
+      `Berhasil memuat ${data.count} pesanan. Data berasal dari server.`
+    );
+  } catch (error) {
+    setMessage(
+      error.message ||
+      "Gagal menghubungi server. Periksa koneksi dan konfigurasi Worker.",
+      true
+    );
+  } finally {
+    busy = false;
+    loadButton.disabled = false;
+    loginButton.disabled = false;
+    loadButton.textContent = "Muat Pesanan";
+  }
+}
+
+loginForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const candidate = tokenInput.value.trim();
+
+  if (!/^[a-f0-9]{64}$/i.test(candidate)) {
+    setMessage("Format token tidak valid.", true);
+    return;
+  }
+
+  adminToken = candidate;
+  await loadOrders();
+});
+
+filterForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  await loadOrders();
+});
+
+logoutButton.addEventListener("click", () => {
+  clearToken();
+});
+
+// Tidak menyimpan token ke localStorage, sessionStorage, atau URL.
+</script>
+</body>
+</html>
