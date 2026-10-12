@@ -513,102 +513,10 @@ async function apiGet(path) {
   return data;
 }
 
-async function loadOrders() {
-  if (busy || !adminToken) return;
-
-  busy = true;
-  $("loadButton").disabled = true;
-  $("loginButton").disabled = true;
-  $("loadButton").textContent = "Memuat...";
-
-  const params = new URLSearchParams({
-    status: $("statusFilter").value,
-    limit: $("limitFilter").value
-  });
-
-  setMessage("Mengambil daftar pesanan...");
-
-  try {
-    const data = await apiGet("/api/admin/orders?" + params.toString());
-    renderOrders(data.orders || []);
-    $("dashboard").hidden = false;
-    $("loginCard").hidden = true;
-
-    setMessage("Berhasil memuat " + data.count + " pesanan.");
-  } catch (error) {
-    setMessage(error.message || "Gagal memuat pesanan.", true);
-  } finally {
-    busy = false;
-    $("loadButton").disabled = false;
-    $("loginButton").disabled = false;
-    $("loadButton").textContent = "Muat Pesanan";
-  }
-}
-
-function renderOrders(orders) {
-  const body = $("ordersBody");
-  body.replaceChildren();
-
-  let pending = 0;
-  let success = 0;
-
-  if (!orders.length) {
-    const row = document.createElement("tr");
-    const cell = document.createElement("td");
-    cell.colSpan = 7;
-    cell.textContent = "Belum ada pesanan untuk filter ini.";
-    row.appendChild(cell);
-    body.appendChild(row);
-  }
-
-  for (const order of orders) {
-    if (order.status === "pending") pending++;
-    if (order.status === "success") success++;
-
-    const row = document.createElement("tr");
-    const idCell = document.createElement("td");
-    idCell.className = "order-id";
-
-    const idButton = document.createElement("button");
-    idButton.type = "button";
-    idButton.className = "link-button";
-    idButton.textContent = order.id || "(tanpa ID)";
-    idButton.setAttribute(
-      "aria-label",
-      "Lihat detail pesanan " + (order.id || "")
-    );
-    idButton.addEventListener("click", () => {
-      if (order.id) loadOrderDetail(order.id);
-    });
-
-    idCell.appendChild(idButton);
-    row.appendChild(idCell);
-
-    addCell(row, order.product_name);
-    addCell(row, order.denomination);
-    addCell(row, formatRupiah(order.amount));
-
-    const statusCell = addCell(row, "");
-    const badge = document.createElement("span");
-    badge.className = "badge " + (order.status || "");
-    badge.textContent = order.status || "unknown";
-    statusCell.appendChild(badge);
-
-    addCell(row, formatDate(order.created_at));
-    addCell(row, formatDate(order.updated_at));
-
-    body.appendChild(row);
-  }
-
-  $("totalCount").textContent = String(orders.length);
-  $("pendingCount").textContent = String(pending);
-  $("successCount").textContent = String(success);
-}
 
 async function loadOrderDetail(orderId) {
   if (!adminToken || detailBusy) return;
 
-  // Hanya menerima bentuk ID yang didukung endpoint Worker.
   if (!/^[a-f0-9-]{32,36}$/i.test(orderId)) {
     setMessage("Format ID pesanan tidak valid.", true);
     return;
@@ -618,6 +526,7 @@ async function loadOrderDetail(orderId) {
   selectedOrderId = orderId;
   $("detailCard").hidden = false;
   $("refreshDetailButton").disabled = true;
+
   setDetailMessage("Mengambil detail terbaru dari server...");
 
   try {
@@ -625,34 +534,90 @@ async function loadOrderDetail(orderId) {
       "/api/admin/orders/" + encodeURIComponent(orderId)
     );
 
-    const order = data.order;
+    // Mendukung format respons Worker dan variasi nama field.
+    const order = data.order || data.data || data;
 
-    setDetailValue("dId", order.id);
-    setDetailValue("dStatus", order.status);
-    setDetailValue("dProductCode", order.productCode);
-    setDetailValue("dProductName", order.productName);
-    setDetailValue("dDenomination", order.denomination);
-    setDetailValue("dAmount", formatRupiah(order.amount));
-    setDetailValue("dCustomer", order.customerReference);
-    setDetailValue("dPayment", order.paymentReference);
-    setDetailValue("dSupplier", order.supplierReference);
-    setDetailValue("dCreated", formatDate(order.createdAt));
-    setDetailValue("dUpdated", formatDate(order.updatedAt));
+    const pick = (...keys) => {
+      for (const key of keys) {
+        if (
+          order[key] !== undefined &&
+          order[key] !== null &&
+          order[key] !== ""
+        ) {
+          return order[key];
+        }
+      }
+      return null;
+    };
+
+    setDetailValue("dId", pick("id", "order_id"));
+    setDetailValue("dStatus", pick("status"));
+
+    setDetailValue(
+      "dProductCode",
+      pick("product_code", "productCode")
+    );
+
+    setDetailValue(
+      "dProductName",
+      pick("product_name", "productName")
+    );
+
+    setDetailValue(
+      "dDenomination",
+      pick("denomination", "nominal")
+    );
+
+    const amount = pick("amount", "price");
+    setDetailValue(
+      "dAmount",
+      amount === null ? null : formatRupiah(amount)
+    );
+
+    setDetailValue(
+      "dCustomer",
+      pick("customer_reference", "customerReference")
+    );
+
+    setDetailValue(
+      "dPayment",
+      pick("payment_reference", "paymentReference")
+    );
+
+    setDetailValue(
+      "dSupplier",
+      pick("supplier_reference", "supplierReference")
+    );
+
+    setDetailValue(
+      "dCreated",
+      formatDate(pick("created_at", "createdAt"))
+    );
+
+    setDetailValue(
+      "dUpdated",
+      formatDate(pick("updated_at", "updatedAt"))
+    );
 
     setDetailMessage(
       "Detail berhasil diperiksa langsung dari Worker dan D1."
     );
+
     $("detailCard").scrollIntoView({
       behavior: "smooth",
       block: "start"
     });
   } catch (error) {
-    setDetailMessage(error.message || "Gagal mengambil detail.", true);
+    setDetailMessage(
+      error.message || "Gagal mengambil detail.",
+      true
+    );
   } finally {
     detailBusy = false;
     $("refreshDetailButton").disabled = false;
   }
 }
+
 
 $("loginForm").addEventListener("submit", async (event) => {
   event.preventDefault();
