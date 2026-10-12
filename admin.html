@@ -513,7 +513,6 @@ async function apiGet(path) {
   return data;
 }
 
-
 async function loadOrderDetail(orderId) {
   if (!adminToken || detailBusy) return;
 
@@ -625,12 +624,27 @@ $("loginForm").addEventListener("submit", async (event) => {
   const candidate = $("adminToken").value.trim();
 
   if (!/^[a-f0-9]{64}$/i.test(candidate)) {
-    setMessage("Format token tidak valid. Token harus 64 karakter hex.", true);
+    setMessage(
+      "Token tidak valid. Pastikan token berisi 64 karakter hex.",
+      true
+    );
     return;
   }
 
   adminToken = candidate;
-  await loadOrders();
+
+  $("loginButton").disabled = true;
+  $("loginButton").textContent = "Memeriksa token...";
+  setMessage("Menghubungi server Lixxy Store...");
+
+  try {
+    await loadOrders();
+  } catch (error) {
+    setMessage(error.message || "Login gagal.", true);
+  } finally {
+    $("loginButton").disabled = false;
+    $("loginButton").textContent = "Masuk dan Muat Pesanan";
+  }
 });
 
 $("filterForm").addEventListener("submit", async (event) => {
